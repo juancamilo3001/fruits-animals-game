@@ -28,13 +28,17 @@ export const HostCreatePage: React.FC = () => {
         throw new Error(rpcError.message);
       }
 
-      if (!data || data.length === 0) {
+      if (!data || (Array.isArray(data) && data.length === 0)) {
         throw new Error('Could not create game room. Please try again.');
       }
 
-      const newRoom = data[0];
-      const roomCode = newRoom.room_code;
-      const hostToken = newRoom.host_token;
+      const newRoom = Array.isArray(data) ? data[0] : data;
+      const roomCode = newRoom?.room_code;
+      const hostToken = newRoom?.host_token;
+
+      if (!roomCode || !hostToken) {
+        throw new Error('Game room was created, but failed to retrieve credentials.');
+      }
 
       saveHostSession({
         roomCode,

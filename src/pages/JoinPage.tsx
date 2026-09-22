@@ -60,11 +60,15 @@ export const JoinPage: React.FC = () => {
         throw new Error(rpcError.message);
       }
 
-      if (!data || data.length === 0) {
+      if (!data || (Array.isArray(data) && data.length === 0)) {
         throw new Error('Unable to join room. Please check the code and try again.');
       }
 
-      const joinedPlayer = data[0];
+      const joinedPlayer = Array.isArray(data) ? data[0] : data;
+      if (!joinedPlayer?.player_id) {
+        throw new Error('Could not retrieve player session from server.');
+      }
+
       saveSession({
         roomCode: cleanCode,
         playerId: joinedPlayer.player_id,
