@@ -71,8 +71,7 @@ export const HostDashboardPage: React.FC = () => {
 
   // Copy shareable join link
   const handleCopyLink = () => {
-    const origin = window.location.origin;
-    const url = `${origin}/join/${cleanCode}`;
+    const url = `https://fruits-animals-game.vercel.app/join/${cleanCode}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
