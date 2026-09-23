@@ -1,0 +1,145 @@
+[33mcommit b8ccfd9b288c9df969f397e2064d28f94a880f4d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: juancamilo3001 <ju4n13022003@gmail.com>
+Date:   Wed Sep 23 08:02:37 2026 -0500
+
+    Actualiza juego a 40 preguntas y mejora respuestas en tiempo real
+
+[1mdiff --git a/src/components/AnswerButtons.tsx b/src/components/AnswerButtons.tsx[m
+[1mindex 9090d9c..1c25b68 100644[m
+[1m--- a/src/components/AnswerButtons.tsx[m
+[1m+++ b/src/components/AnswerButtons.tsx[m
+[36m@@ -32,7 +32,6 @@[m [mexport const AnswerButtons: React.FC<AnswerButtonsProps> = ({[m
+         const isCorrectResult = currentResult?.correct_answer === key;[m
+         const isWrongResult = currentResult && isSelected && !isCorrectResult;[m
+ [m
+[31m-        // Button style logic based on active / submitted / results states[m
+         let btnStyles =[m
+           'bg-slate-900/90 border-slate-700/80 text-white hover:bg-slate-800 hover:border-emerald-500/50 hover:scale-[1.01]';[m
+         let badgeStyles = 'bg-slate-800 text-slate-300 border-slate-700';[m
+[36m@@ -62,7 +61,6 @@[m [mexport const AnswerButtons: React.FC<AnswerButtonsProps> = ({[m
+             disabled={disabled || submitting}[m
+             className={`w-full min-h-[64px] sm:min-h-[72px] px-5 py-3 rounded-2xl border-2 transition-all duration-150 flex items-center justify-between gap-4 text-left active:scale-[0.98] disabled:cursor-not-allowed ${btnStyles}`}[m
+           >[m
+[31m-            {/* Left: Option Letter Pill & Text */}[m
+             <div className="flex items-center gap-3.5 min-w-0">[m
+               <span[m
+                 className={`w-10 h-10 rounded-xl text-base font-black flex items-center justify-center border shadow-sm flex-shrink-0 transition-colors ${badgeStyles}`}[m
+[36m@@ -74,7 +72,6 @@[m [mexport const AnswerButtons: React.FC<AnswerButtonsProps> = ({[m
+               </span>[m
+             </div>[m
+ [m
+[31m-            {/* Right: State icon / feedback */}[m
+             <div className="flex-shrink-0">[m
+               {currentResult ? ([m
+                 isCorrectResult ? ([m
+[36m@@ -84,7 +81,7 @@[m [mexport const AnswerButtons: React.FC<AnswerButtonsProps> = ({[m
+                 ) : null[m
+               ) : isSelected ? ([m
+                 <span className="text-xs font-bold px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase">[m
+[31m-                  SUBMITTED[m
+[32m+[m[32m                  ENVIADA[m
+                 </span>[m
+               ) : null}[m
+             </div>[m
+[1mdiff --git a/src/components/AnswerOrder.tsx b/src/components/AnswerOrder.tsx[m
+[1mindex 47e2d11..bf33915 100644[m
+[1m--- a/src/components/AnswerOrder.tsx[m
+[1m+++ b/src/components/AnswerOrder.tsx[m
+[36m@@ -17,10 +17,10 @@[m [mexport const AnswerOrder: React.FC<AnswerOrderProps> = ({[m
+   gameStatus,[m
+   className = '',[m
+ }) => {[m
+[31m-  // Sort answers by response_time_ms ascending (or answered_at)[m
+[32m+[m[32m  // Ordenar respuestas por response_time_ms ascendente (el más rápido primero)[m
+   const sortedAnswers = [...answers].sort((a, b) => a.response_time_ms - b.response_time_ms);[m
+ [m
+[31m-  // Identify players who have not answered yet[m
+[32m+[m[32m  // Jugadores que aún no han respondido[m
+   const answeredPlayerIds = new Set(answers.map((a) => a.player_id));[m
+   const waitingPlayers = players.filter((p) => !answeredPlayerIds.has(p.id));[m
+ [m
+[36m@@ -30,7 +30,7 @@[m [mexport const AnswerOrder: React.FC<AnswerOrderProps> = ({[m
+     <div[m
+       className={`bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col shadow-xl backdrop-blur-sm ${className}`}[m
+     >[m
+[31m-      {/* Header */}[m
+[32m+[m[32m      {/* Encabezado */}[m
+       <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">[m
+         <div className="flex items-center gap-2">[m
+           <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">[m
+[36m@@ -38,27 +38,27 @@[m [mexport const AnswerOrder: React.FC<AnswerOrderProps> = ({[m
+           </div>[m
+           <div>[m
+             <h3 className="font-extrabold text-sm tracking-wider uppercase text-white">[m
+[31m-              ANSWER ORDER[m
+[32m+[m[32m              ORDEN DE RESPUESTA[m
+             </h3>[m
+             <span className="text-[10px] text-slate-400 font-medium">[m
+[31m-              {answers.length} of {players.length} answered[m
+[32m+[m[32m              {answers.length} de {players.length} respondieron[m
+             </span>[m
+           </div>[m
+         </div>[m
+ [m
+[31m-        {/* Live indicator */}[m
+[32m+[m[32m        {/* Indicador EN VIVO */}[m
+         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-[10px] font-semibold text-emerald-400">[m
+           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />[m
+[31m-          REALTIME[m
+[32m+[m[32m          EN VIVO[m
+         </div>[m
+       </div>[m
+ [m
+[31m-      {/* Answered Players List */}[m
+[32m+[m[32m      {/* Lista de jugadores que respondieron */}[m
+       <div className="flex-1 overflow-y-auto space-y-2 max-h-64 sm:max-h-80 pr-1 custom-scrollbar">[m
+         {sortedAnswers.length === 0 ? ([m
+           <div className="py-8 text-center text-slate-500 text-xs flex flex-col items-center justify-center gap-2">[m
+             <Clock className="w-6 h-6 animate-pulse text-slate-600" />[m
+[31m-            <span>Waiting for first response...</span>[m
+[32m+[m[32m            <span>Esperando la primera respuesta...</span>[m
+           </div>[m
+         ) : ([m
+           sortedAnswers.map((ans, idx) => {[m
+[36m@@ -74,7 +74,7 @@[m [mexport const AnswerOrder: React.FC<AnswerOrderProps> = ({[m
+                     : 'bg-slate-800/60 border-slate-700/50 hover:bg-slate-800'[m
+                 }`}[m
+               >[m
+[31m-                {/* Left: Position & Name */}[m
+[32m+[m[32m                {/* Izquierda: Posición y Nombre */}[m
+                 <div className="flex items-center gap-2.5 min-w-0">[m
+                   <span[m
+                     className={`w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center flex-shrink-0 ${[m
+[36m@@ -96,17 +96,17 @@[m [mexport const AnswerOrder: React.FC<AnswerOrderProps> = ({[m
+                         isCurrent ? 'text-emerald-300 font-extrabold' : 'text-slate-200'[m
+                       }`}[m
+                     >[m
+[31m-                      {isCurrent ? 'YOU' : ans.nickname}[m
+[32m+[m[32m                      {isCurrent ? 'TÚ' : ans.nickname}[m
+                     </span>[m
+                     {isCurrent && ([m
+                       <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500 text-slate-950 uppercase">[m
+[31m-                        YOU[m
+[32m+[m[32m                        TÚ[m
+                       </span>[m
+                     )}[m
+                   </div>[m
+                 </div>[m
+ [m
+[31m-                {/* Right: Response time & results */}[m
+[32m+[m[32m                {/* Derecha: Tiempo y resultado */}[m
+                 <div className="flex items-center gap-2 flex-shrink-0 pl-2">[m
+                   <span className="text-xs font-mono font-semibold text-slate-400">[m
+                     {timeSec}s[m
+[36m@@ -134,12 +134,12 @@[m [mexport const AnswerOrder: React.FC<AnswerOrderProps> = ({[m
+         )}[m
+       </div>[m
+ [m
+[31m-      {/* Waiting Players Section */}[m
+[32m+[m[32m      {/* Jugadores esperando */}[m
+       {waitingPlayers.length > 0 && ([m
+         <div className="mt-3 pt-3 border-t border-slate-800">[m
+           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">[m
+             <Users className="w-3.5 h-3.5 text-slate-500" />[m
+[31m-            <span>WAITING ({waitingPlayers.length})</span>[m
+[32m+[m[32m            <span>E

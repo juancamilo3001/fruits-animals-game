@@ -149,38 +149,26 @@ export const HostDashboardPage: React.FC = () => {
 
   // =====================================================================
   // AVANCE AUTOMÁTICO CASO B/C: Timer de 15 segundos (fallback)
-  // No correr si está PAUSED
+  // Fix: En lugar de comparar Date.now() con question_started_at (lo que causa 
+  // que el host avance instantáneamente si su reloj local está adelantado),
+  // simplemente usamos un setTimeout local estricto de 15s al entrar en QUESTION_ACTIVE.
   // =====================================================================
   useEffect(() => {
     if (!room || !hostToken || room.status !== 'QUESTION_ACTIVE') return;
-    if (!room.question_started_at) return;
-
-    const startedAt = new Date(room.question_started_at).getTime();
-    const elapsed = Date.now() - startedAt;
-    const remaining = Math.max(0, QUESTION_TIME_LIMIT_MS - elapsed);
 
     const key = `${cleanCode}-${room.current_question}-results`;
-
-    if (remaining === 0) {
-      if (autoAdvanceRef.current !== key) {
-        autoAdvanceRef.current = key;
-        handleAdvance('SHOW_RESULTS');
-      }
-      return;
-    }
 
     const timer = window.setTimeout(() => {
       if (autoAdvanceRef.current !== key) {
         autoAdvanceRef.current = key;
         handleAdvance('SHOW_RESULTS');
       }
-    }, remaining);
+    }, QUESTION_TIME_LIMIT_MS);
 
     return () => window.clearTimeout(timer);
   }, [
     room?.status,
     room?.current_question,
-    room?.question_started_at,
     cleanCode,
     hostToken,
     handleAdvance,

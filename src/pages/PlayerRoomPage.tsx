@@ -49,6 +49,7 @@ export const PlayerRoomPage: React.FC = () => {
     points: number;
     response_time_ms: number;
   } | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState<boolean>(false);
 
@@ -63,6 +64,7 @@ export const PlayerRoomPage: React.FC = () => {
       if (!currentAnswer) {
         setSelectedAnswer(null);
         setSubmissionFeedback(null);
+        setSubmissionError(null);
       }
     }
   }, [room?.current_question, room?.status, currentAnswer]);
@@ -76,6 +78,7 @@ export const PlayerRoomPage: React.FC = () => {
         points: currentAnswer.points,
         response_time_ms: currentAnswer.response_time_ms,
       });
+      setSubmissionError(null);
     }
   }, [currentAnswer]);
 
@@ -115,6 +118,7 @@ export const PlayerRoomPage: React.FC = () => {
 
     setSelectedAnswer(option);
     setSubmitting(true);
+    setSubmissionError(null);
 
     try {
       const { data, error: rpcError } = await supabase.rpc('submit_player_answer', {
@@ -139,6 +143,8 @@ export const PlayerRoomPage: React.FC = () => {
       }
     } catch (err: unknown) {
       console.error('Error al enviar respuesta:', err);
+      setSubmissionError(err instanceof Error ? err.message : 'Error desconocido al enviar respuesta.');
+      setSelectedAnswer(null); // Permitir que el jugador vuelva a intentar
     } finally {
       setSubmitting(false);
     }
@@ -352,6 +358,16 @@ export const PlayerRoomPage: React.FC = () => {
                           </span>
                         </>
                       )}
+                    </div>
+                  )}
+
+                  {/* Mostrar errores del RPC al jugador */}
+                  {submissionError && (
+                    <div className="w-full max-w-lg mb-3 p-3 rounded-2xl bg-rose-950/50 border border-rose-500/40 text-center flex items-center justify-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-bold text-rose-300">
+                        {submissionError}
+                      </span>
                     </div>
                   )}
 
