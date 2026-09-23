@@ -27,7 +27,7 @@ export const ResultsPage: React.FC = () => {
           setLeaderboard(data as LeaderboardEntry[]);
         }
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to load results');
+        setError(err instanceof Error ? err.message : 'Error al cargar los resultados');
       } finally {
         setLoading(false);
       }
@@ -49,7 +49,7 @@ export const ResultsPage: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>HOME</span>
+            <span>INICIO</span>
           </Link>
         </div>
 
@@ -57,23 +57,23 @@ export const ResultsPage: React.FC = () => {
           <div className="py-20 text-center">
             <RefreshCw className="w-10 h-10 animate-spin text-emerald-400 mx-auto mb-4" />
             <p className="text-sm font-bold text-slate-300 uppercase tracking-wider">
-              Loading Leaderboard...
+              Cargando Clasificación...
             </p>
           </div>
         ) : error || leaderboard.length === 0 ? (
           <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-xl my-12">
             <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-3" />
             <h2 className="text-xl font-black text-white uppercase mb-2">
-              No Results Found
+              Sin Resultados
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              {error || `No match data found for Room ${cleanCode}.`}
+              {error || `No se encontraron datos de la Sala ${cleanCode}.`}
             </p>
             <Link
               to="/join"
               className="w-full inline-block py-3 px-6 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm uppercase tracking-wider transition-colors"
             >
-              Play a Game
+              Jugar una Partida
             </Link>
           </div>
         ) : (

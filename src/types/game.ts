@@ -14,7 +14,6 @@ export interface QuestionPublic {
   category: QuestionCategory;
   question_number: number;
   question_text: string;
-  image_url: string;
   option_a: string;
   option_b: string;
   option_c: string;

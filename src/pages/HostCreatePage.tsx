@@ -14,7 +14,7 @@ export const HostCreatePage: React.FC = () => {
 
   const handleCreateRoom = async () => {
     if (!isSupabaseConfigured()) {
-      setError('Database is not connected. Please add your Supabase credentials in .env');
+      setError('La base de datos no está conectada. Por favor agrega tus credenciales de Supabase en .env');
       return;
     }
 
@@ -29,7 +29,7 @@ export const HostCreatePage: React.FC = () => {
       }
 
       if (!data || (Array.isArray(data) && data.length === 0)) {
-        throw new Error('Could not create game room. Please try again.');
+        throw new Error('No se pudo crear la sala. Por favor intenta de nuevo.');
       }
 
       const newRoom = Array.isArray(data) ? data[0] : data;
@@ -37,7 +37,7 @@ export const HostCreatePage: React.FC = () => {
       const hostToken = newRoom?.host_token;
 
       if (!roomCode || !hostToken) {
-        throw new Error('Game room was created, but failed to retrieve credentials.');
+        throw new Error('La sala fue creada pero no se pudieron obtener las credenciales.');
       }
 
       saveHostSession({
@@ -47,8 +47,8 @@ export const HostCreatePage: React.FC = () => {
 
       navigate(`/host/${roomCode}`);
     } catch (err: unknown) {
-      console.error('Error creating room:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create room.');
+      console.error('Error al crear sala:', err);
+      setError(err instanceof Error ? err.message : 'Error al crear la sala.');
     } finally {
       setLoading(false);
     }
@@ -65,43 +65,43 @@ export const HostCreatePage: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>BACK TO HOME</span>
+            <span>VOLVER AL INICIO</span>
           </Link>
         </div>
 
         <div className="w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-md text-center">
-          {/* Host Icon */}
+          {/* Ícono del Host */}
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-amber-500/20">
             <Shield className="w-8 h-8 fill-current" />
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mb-2">
-            HOST A GAME
+            CREAR PARTIDA
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mb-6">
-            Create an official room, display live question graphics, and control competition flow.
+            Crea una sala oficial, muestra las preguntas en vivo y controla el flujo de la competición.
           </p>
 
-          {/* Active Session Reconnect */}
+          {/* Sesión activa — reconectar */}
           {session && (
             <div className="mb-6 p-4 rounded-2xl bg-slate-800/80 border border-amber-500/30 text-left">
               <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block mb-1">
-                Active Host Session
+                Sesión Activa de Host
               </span>
               <p className="text-sm text-slate-200 mb-3">
-                You previously created Room <strong>{session.roomCode}</strong>.
+                Creaste anteriormente la Sala <strong>{session.roomCode}</strong>.
               </p>
               <Link
                 to={`/host/${session.roomCode}`}
                 className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-colors shadow"
               >
                 <Play className="w-4 h-4 fill-current" />
-                Resume Dashboard ({session.roomCode})
+                Volver al Panel ({session.roomCode})
               </Link>
             </div>
           )}
 
-          {/* Error Banner */}
+          {/* Banner de error */}
           {error && (
             <div className="mb-6 p-3.5 rounded-2xl bg-rose-950/60 border border-rose-500/40 text-xs text-rose-300 flex items-start gap-2.5 text-left">
               <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
@@ -109,7 +109,7 @@ export const HostCreatePage: React.FC = () => {
             </div>
           )}
 
-          {/* Create Button */}
+          {/* Botón Crear */}
           <button
             onClick={handleCreateRoom}
             disabled={loading}
@@ -118,12 +118,12 @@ export const HostCreatePage: React.FC = () => {
             {loading ? (
               <>
                 <RefreshCw className="w-5 h-5 animate-spin" />
-                <span>GENERATING ROOM...</span>
+                <span>GENERANDO SALA...</span>
               </>
             ) : (
               <>
                 <PlusCircle className="w-5 h-5" />
-                <span>CREATE NEW GAME ROOM</span>
+                <span>CREAR NUEVA SALA</span>
               </>
             )}
           </button>

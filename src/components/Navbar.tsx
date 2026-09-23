@@ -40,21 +40,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-white group-hover:text-emerald-400 transition-colors">
-                FRUITS & ANIMALS
+                FRUTAS Y ANIMALES
               </span>
               <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse hidden sm:inline-block" />
             </div>
             <p className="text-[10px] font-semibold tracking-wider uppercase text-emerald-400/90 -mt-0.5">
-              English Challenge
+              Desafío en Inglés
             </p>
           </div>
         </Link>
 
-        {/* Center: Room Code Display if inside room */}
+        {/* Center: Room Code Display */}
         {roomCode && (
           <div className="flex items-center gap-2 bg-slate-900/90 border border-slate-700/60 rounded-xl px-3 py-1.5 shadow-inner">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              ROOM:
+              SALA:
             </span>
             <span className="font-mono font-black text-sm sm:text-base tracking-widest text-emerald-400">
               {roomCode}
@@ -67,26 +67,25 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         )}
 
-        {/* Right Actions: Connection status, sound toggle, leave button */}
+        {/* Right Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Connection status */}
           <div
             className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border ${
               isConnected
                 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                 : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
             }`}
-            title={isConnected ? 'Connected to Realtime' : 'Reconnecting...'}
+            title={isConnected ? 'Conectado en tiempo real' : 'Reconectando...'}
           >
             {isConnected ? (
               <>
                 <Wifi className="w-3.5 h-3.5" />
-                <span>Live</span>
+                <span>En vivo</span>
               </>
             ) : (
               <>
                 <WifiOff className="w-3.5 h-3.5 animate-pulse" />
-                <span>Offline</span>
+                <span>Sin conexión</span>
               </>
             )}
           </div>
@@ -97,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={handleLeave}
               className="p-2 rounded-xl border border-slate-700/60 bg-slate-800/80 hover:bg-rose-900/40 hover:border-rose-700/60 text-slate-300 hover:text-rose-300 transition-colors"
-              title="Leave Room"
+              title="Salir de la Sala"
             >
               <LogOut className="w-5 h-5" />
             </button>

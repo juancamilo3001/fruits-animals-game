@@ -17,10 +17,10 @@ export const AnswerOrder: React.FC<AnswerOrderProps> = ({
   gameStatus,
   className = '',
 }) => {
-  // Sort answers by response_time_ms ascending (or answered_at)
+  // Ordenar respuestas por response_time_ms ascendente (el más rápido primero)
   const sortedAnswers = [...answers].sort((a, b) => a.response_time_ms - b.response_time_ms);
 
-  // Identify players who have not answered yet
+  // Jugadores que aún no han respondido
   const answeredPlayerIds = new Set(answers.map((a) => a.player_id));
   const waitingPlayers = players.filter((p) => !answeredPlayerIds.has(p.id));
 
@@ -30,7 +30,7 @@ export const AnswerOrder: React.FC<AnswerOrderProps> = ({
     <div
       className={`bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col shadow-xl backdrop-blur-sm ${className}`}
     >
-      {/* Header */}
+      {/* Encabezado */}
       <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
@@ -38,27 +38,27 @@ export const AnswerOrder: React.FC<AnswerOrderProps> = ({
           </div>
           <div>
             <h3 className="font-extrabold text-sm tracking-wider uppercase text-white">
-              ANSWER ORDER
+              ORDEN DE RESPUESTA
             </h3>
             <span className="text-[10px] text-slate-400 font-medium">
-              {answers.length} of {players.length} answered
+              {answers.length} de {players.length} respondieron
             </span>
           </div>
         </div>
 
-        {/* Live indicator */}
+        {/* Indicador EN VIVO */}
         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-[10px] font-semibold text-emerald-400">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-          REALTIME
+          EN VIVO
         </div>
       </div>
 
-      {/* Answered Players List */}
+      {/* Lista de jugadores que respondieron */}
       <div className="flex-1 overflow-y-auto space-y-2 max-h-64 sm:max-h-80 pr-1 custom-scrollbar">
         {sortedAnswers.length === 0 ? (
           <div className="py-8 text-center text-slate-500 text-xs flex flex-col items-center justify-center gap-2">
             <Clock className="w-6 h-6 animate-pulse text-slate-600" />
-            <span>Waiting for first response...</span>
+            <span>Esperando la primera respuesta...</span>
           </div>
         ) : (
           sortedAnswers.map((ans, idx) => {
@@ -74,7 +74,7 @@ export const AnswerOrder: React.FC<AnswerOrderProps> = ({
                     : 'bg-slate-800/60 border-slate-700/50 hover:bg-slate-800'
                 }`}
               >
-                {/* Left: Position & Name */}
+                {/* Izquierda: Posición y Nombre */}
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span
                     className={`w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center flex-shrink-0 ${
@@ -96,17 +96,17 @@ export const AnswerOrder: React.FC<AnswerOrderProps> = ({
                         isCurrent ? 'text-emerald-300 font-extrabold' : 'text-slate-200'
                       }`}
                     >
-                      {isCurrent ? 'YOU' : ans.nickname}
+                      {isCurrent ? 'TÚ' : ans.nickname}
                     </span>
                     {isCurrent && (
                       <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500 text-slate-950 uppercase">
-                        YOU
+                        TÚ
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Right: Response time & results */}
+                {/* Derecha: Tiempo y resultado */}
                 <div className="flex items-center gap-2 flex-shrink-0 pl-2">
                   <span className="text-xs font-mono font-semibold text-slate-400">
                     {timeSec}s
@@ -134,12 +134,12 @@ export const AnswerOrder: React.FC<AnswerOrderProps> = ({
         )}
       </div>
 
-      {/* Waiting Players Section */}
+      {/* Jugadores esperando */}
       {waitingPlayers.length > 0 && (
         <div className="mt-3 pt-3 border-t border-slate-800">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
             <Users className="w-3.5 h-3.5 text-slate-500" />
-            <span>WAITING ({waitingPlayers.length})</span>
+            <span>ESPERANDO ({waitingPlayers.length})</span>
           </div>
           <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
             {waitingPlayers.map((player) => (
@@ -151,7 +151,7 @@ export const AnswerOrder: React.FC<AnswerOrderProps> = ({
                     : 'bg-slate-800 text-slate-400 border-slate-700/60'
                 }`}
               >
-                {player.id === currentPlayerId ? 'YOU' : player.nickname}
+                {player.id === currentPlayerId ? 'TÚ' : player.nickname}
               </span>
             ))}
           </div>

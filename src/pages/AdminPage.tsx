@@ -23,13 +23,12 @@ export const AdminPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
-  // Editing modal / drawer state
   const [editingQuestion, setEditingQuestion] = useState<AdminQuestion | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const fetchQuestions = async () => {
     if (!isSupabaseConfigured()) {
-      setError('Supabase credentials not configured in .env');
+      setError('Credenciales de Supabase no configuradas en .env');
       setLoading(false);
       return;
     }
@@ -41,7 +40,7 @@ export const AdminPage: React.FC = () => {
         setQuestions(data as AdminQuestion[]);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch questions');
+      setError(err instanceof Error ? err.message : 'Error al cargar las preguntas');
     } finally {
       setLoading(false);
     }
@@ -61,11 +60,11 @@ export const AdminPage: React.FC = () => {
     setEditingQuestion({
       category: 'fruits',
       question_number: nextNum,
-      question_text: 'Which fruit is this?',
-      image_url: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600&auto=format&fit=crop&q=80',
-      option_a: 'APPLE',
-      option_b: 'BANANA',
-      option_c: 'ORANGE',
+      question_text: '¿Cómo se dice "_____" en inglés?',
+      image_url: '',
+      option_a: 'OPCIÓN A',
+      option_b: 'OPCIÓN B',
+      option_c: 'OPCIÓN C',
       correct_answer: 'A',
     });
     setSaveSuccess(null);
@@ -82,7 +81,7 @@ export const AdminPage: React.FC = () => {
         p_category: editingQuestion.category,
         p_question_number: editingQuestion.question_number,
         p_question_text: editingQuestion.question_text.trim(),
-        p_image_url: editingQuestion.image_url.trim(),
+        p_image_url: '', // Sin imagen — campo requerido por la BD pero no se muestra
         p_option_a: editingQuestion.option_a.trim().toUpperCase(),
         p_option_b: editingQuestion.option_b.trim().toUpperCase(),
         p_option_c: editingQuestion.option_c.trim().toUpperCase(),
@@ -91,11 +90,11 @@ export const AdminPage: React.FC = () => {
 
       if (rpcErr) throw new Error(rpcErr.message);
 
-      setSaveSuccess(`Question #${editingQuestion.question_number} saved successfully!`);
+      setSaveSuccess(`¡Pregunta #${editingQuestion.question_number} guardada correctamente!`);
       setEditingQuestion(null);
       await fetchQuestions();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save question');
+      setError(err instanceof Error ? err.message : 'Error al guardar la pregunta');
     } finally {
       setIsSaving(false);
     }
@@ -106,7 +105,7 @@ export const AdminPage: React.FC = () => {
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 flex flex-col">
-        {/* Top Header */}
+        {/* Encabezado */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
             <div className="flex items-center gap-2">
@@ -115,11 +114,11 @@ export const AdminPage: React.FC = () => {
               </Link>
               <h1 className="text-2xl sm:text-3xl font-black uppercase text-white flex items-center gap-2">
                 <Shield className="w-7 h-7 text-amber-400" />
-                <span>Question Management Panel</span>
+                <span>Panel de Administración de Preguntas</span>
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Add, edit, or customize English questions, vocabulary options, and image URLs.
+              Agregar, editar o personalizar preguntas y opciones de vocabulario en inglés.
             </p>
           </div>
 
@@ -128,11 +127,11 @@ export const AdminPage: React.FC = () => {
             className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-colors shadow flex items-center gap-2 self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Question</span>
+            <span>Agregar Pregunta</span>
           </button>
         </div>
 
-        {/* Notifications */}
+        {/* Notificaciones */}
         {saveSuccess && (
           <div className="my-4 p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -147,20 +146,20 @@ export const AdminPage: React.FC = () => {
           </div>
         )}
 
-        {/* Edit Modal / Drawer */}
+        {/* Modal de edición */}
         {editingQuestion && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
             <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl my-8">
               <h2 className="text-xl font-black text-white uppercase mb-4 flex items-center gap-2">
                 <Edit2 className="w-5 h-5 text-amber-400" />
-                <span>Edit Question #{editingQuestion.question_number}</span>
+                <span>Editar Pregunta #{editingQuestion.question_number}</span>
               </h2>
 
               <form onSubmit={handleSave} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
-                      Question #
+                      Nro. de Pregunta
                     </label>
                     <input
                       type="number"
@@ -175,7 +174,7 @@ export const AdminPage: React.FC = () => {
 
                   <div>
                     <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
-                      Category
+                      Categoría
                     </label>
                     <select
                       value={editingQuestion.category}
@@ -187,15 +186,15 @@ export const AdminPage: React.FC = () => {
                       }
                       className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
-                      <option value="fruits">Fruits</option>
-                      <option value="animals">Animals</option>
+                      <option value="fruits">Frutas</option>
+                      <option value="animals">Animales</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
-                    Question Text
+                    Texto de la Pregunta (en español)
                   </label>
                   <input
                     type="text"
@@ -203,39 +202,16 @@ export const AdminPage: React.FC = () => {
                     onChange={(e) =>
                       setEditingQuestion({ ...editingQuestion, question_text: e.target.value })
                     }
+                    placeholder='ej. ¿Cómo se dice "manzana" en inglés?'
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     required
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={editingQuestion.image_url}
-                    onChange={(e) =>
-                      setEditingQuestion({ ...editingQuestion, image_url: e.target.value })
-                    }
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
-                    required
-                  />
-                  {editingQuestion.image_url && (
-                    <div className="mt-2 w-full h-32 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
-                      <img
-                        src={editingQuestion.image_url}
-                        alt="Preview"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  )}
-                </div>
-
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
-                      Option A
+                      Opción A
                     </label>
                     <input
                       type="text"
@@ -243,13 +219,14 @@ export const AdminPage: React.FC = () => {
                       onChange={(e) =>
                         setEditingQuestion({ ...editingQuestion, option_a: e.target.value })
                       }
+                      placeholder="APPLE"
                       className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-bold text-white uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       required
                     />
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
-                      Option B
+                      Opción B
                     </label>
                     <input
                       type="text"
@@ -257,13 +234,14 @@ export const AdminPage: React.FC = () => {
                       onChange={(e) =>
                         setEditingQuestion({ ...editingQuestion, option_b: e.target.value })
                       }
+                      placeholder="BANANA"
                       className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-bold text-white uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       required
                     />
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
-                      Option C
+                      Opción C
                     </label>
                     <input
                       type="text"
@@ -271,6 +249,7 @@ export const AdminPage: React.FC = () => {
                       onChange={(e) =>
                         setEditingQuestion({ ...editingQuestion, option_c: e.target.value })
                       }
+                      placeholder="ORANGE"
                       className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-bold text-white uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       required
                     />
@@ -279,7 +258,7 @@ export const AdminPage: React.FC = () => {
 
                 <div>
                   <label className="block text-[11px] font-bold uppercase text-slate-400 mb-1">
-                    Correct Answer
+                    Respuesta Correcta
                   </label>
                   <div className="grid grid-cols-3 gap-3">
                     {(['A', 'B', 'C'] as AnswerOption[]).map((opt) => (
@@ -295,7 +274,7 @@ export const AdminPage: React.FC = () => {
                             : 'bg-slate-950 text-slate-400 border-slate-700 hover:bg-slate-800'
                         }`}
                       >
-                        Option {opt}
+                        Opción {opt}
                       </button>
                     ))}
                   </div>
@@ -307,7 +286,7 @@ export const AdminPage: React.FC = () => {
                     onClick={() => setEditingQuestion(null)}
                     className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs uppercase"
                   >
-                    Cancel
+                    Cancelar
                   </button>
                   <button
                     type="submit"
@@ -315,7 +294,7 @@ export const AdminPage: React.FC = () => {
                     className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow"
                   >
                     {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span>Save Question</span>
+                    <span>Guardar Pregunta</span>
                   </button>
                 </div>
               </form>
@@ -323,11 +302,11 @@ export const AdminPage: React.FC = () => {
           </div>
         )}
 
-        {/* Questions Grid */}
+        {/* Grid de preguntas */}
         {loading ? (
           <div className="py-20 text-center">
             <RefreshCw className="w-10 h-10 animate-spin text-emerald-400 mx-auto mb-3" />
-            <p className="text-sm font-bold text-slate-400">Loading Questions Database...</p>
+            <p className="text-sm font-bold text-slate-400">Cargando Base de Datos de Preguntas...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
@@ -337,25 +316,16 @@ export const AdminPage: React.FC = () => {
                 className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-lg hover:border-slate-700 transition-colors"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-3">
                     <span className="font-mono text-xs font-black text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30">
-                      Q#{String(q.question_number).padStart(2, '0')}
+                      P#{String(q.question_number).padStart(2, '0')}
                     </span>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">
-                      {q.category}
+                      {q.category === 'fruits' ? 'Fruta' : 'Animal'}
                     </span>
                   </div>
 
-                  <div className="w-full aspect-[16/10] bg-slate-950 rounded-xl overflow-hidden mb-3 border border-slate-800">
-                    <img
-                      src={q.image_url}
-                      alt={q.question_text}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <p className="text-sm font-bold text-white mb-2">{q.question_text}</p>
+                  <p className="text-sm font-bold text-white mb-3">{q.question_text}</p>
 
                   <div className="space-y-1 mb-3 text-xs">
                     <div
@@ -366,7 +336,7 @@ export const AdminPage: React.FC = () => {
                       }`}
                     >
                       <span>A. {q.option_a}</span>
-                      {q.correct_answer === 'A' && <span className="font-black">✓ CORRECT</span>}
+                      {q.correct_answer === 'A' && <span className="font-black">✓</span>}
                     </div>
                     <div
                       className={`px-2.5 py-1 rounded-lg border font-semibold flex items-center justify-between ${
@@ -376,7 +346,7 @@ export const AdminPage: React.FC = () => {
                       }`}
                     >
                       <span>B. {q.option_b}</span>
-                      {q.correct_answer === 'B' && <span className="font-black">✓ CORRECT</span>}
+                      {q.correct_answer === 'B' && <span className="font-black">✓</span>}
                     </div>
                     <div
                       className={`px-2.5 py-1 rounded-lg border font-semibold flex items-center justify-between ${
@@ -386,7 +356,7 @@ export const AdminPage: React.FC = () => {
                       }`}
                     >
                       <span>C. {q.option_c}</span>
-                      {q.correct_answer === 'C' && <span className="font-black">✓ CORRECT</span>}
+                      {q.correct_answer === 'C' && <span className="font-black">✓</span>}
                     </div>
                   </div>
                 </div>
@@ -396,7 +366,7 @@ export const AdminPage: React.FC = () => {
                   className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Edit2 className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Edit Question</span>
+                  <span>Editar Pregunta</span>
                 </button>
               </div>
             ))}

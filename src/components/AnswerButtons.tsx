@@ -32,7 +32,6 @@ export const AnswerButtons: React.FC<AnswerButtonsProps> = ({
         const isCorrectResult = currentResult?.correct_answer === key;
         const isWrongResult = currentResult && isSelected && !isCorrectResult;
 
-        // Button style logic based on active / submitted / results states
         let btnStyles =
           'bg-slate-900/90 border-slate-700/80 text-white hover:bg-slate-800 hover:border-emerald-500/50 hover:scale-[1.01]';
         let badgeStyles = 'bg-slate-800 text-slate-300 border-slate-700';
@@ -62,7 +61,6 @@ export const AnswerButtons: React.FC<AnswerButtonsProps> = ({
             disabled={disabled || submitting}
             className={`w-full min-h-[64px] sm:min-h-[72px] px-5 py-3 rounded-2xl border-2 transition-all duration-150 flex items-center justify-between gap-4 text-left active:scale-[0.98] disabled:cursor-not-allowed ${btnStyles}`}
           >
-            {/* Left: Option Letter Pill & Text */}
             <div className="flex items-center gap-3.5 min-w-0">
               <span
                 className={`w-10 h-10 rounded-xl text-base font-black flex items-center justify-center border shadow-sm flex-shrink-0 transition-colors ${badgeStyles}`}
@@ -74,7 +72,6 @@ export const AnswerButtons: React.FC<AnswerButtonsProps> = ({
               </span>
             </div>
 
-            {/* Right: State icon / feedback */}
             <div className="flex-shrink-0">
               {currentResult ? (
                 isCorrectResult ? (
@@ -84,7 +81,7 @@ export const AnswerButtons: React.FC<AnswerButtonsProps> = ({
                 ) : null
               ) : isSelected ? (
                 <span className="text-xs font-bold px-2 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase">
-                  SUBMITTED
+                  ENVIADA
                 </span>
               ) : null}
             </div>

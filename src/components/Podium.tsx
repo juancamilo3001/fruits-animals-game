@@ -18,7 +18,6 @@ export const Podium: React.FC<PodiumProps> = ({
   isHost = false,
 }) => {
   useEffect(() => {
-    // Fire celebratory confetti burst
     sounds.playFanfare();
 
     const end = Date.now() + 2.5 * 1000;
@@ -52,22 +51,22 @@ export const Podium: React.FC<PodiumProps> = ({
 
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col items-center py-6 px-4">
-      {/* Title */}
+      {/* Título */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-black uppercase tracking-wider mb-2">
-          <Trophy className="w-4 h-4" /> CHAMPIONSHIP RESULTS
+          <Trophy className="w-4 h-4" /> RESULTADOS DEL CAMPEONATO
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase">
-          FINAL RESULTS
+          RESULTADOS FINALES
         </h1>
         <p className="text-slate-400 text-sm mt-1">
-          Fruits & Animals — English Challenge Leaderboard
+          Frutas y Animales — Desafío en Inglés
         </p>
       </div>
 
-      {/* Top 3 Podium Cards */}
+      {/* Podio Top 3 */}
       <div className="w-full grid grid-cols-3 gap-2 sm:gap-4 items-end mb-10 max-w-2xl">
-        {/* 2nd Place */}
+        {/* 2.º Lugar */}
         <div className="flex flex-col items-center">
           {second ? (
             <>
@@ -91,7 +90,7 @@ export const Podium: React.FC<PodiumProps> = ({
           )}
         </div>
 
-        {/* 1st Place */}
+        {/* 1.er Lugar */}
         <div className="flex flex-col items-center">
           {first ? (
             <>
@@ -116,7 +115,7 @@ export const Podium: React.FC<PodiumProps> = ({
           )}
         </div>
 
-        {/* 3rd Place */}
+        {/* 3.er Lugar */}
         <div className="flex flex-col items-center">
           {third ? (
             <>
@@ -141,14 +140,14 @@ export const Podium: React.FC<PodiumProps> = ({
         </div>
       </div>
 
-      {/* Comprehensive Leaderboard Table */}
+      {/* Tabla de clasificación completa */}
       <div className="w-full bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl mb-8">
         <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
           <h3 className="font-extrabold text-sm sm:text-base text-white uppercase tracking-wider">
-            ALL PLAYERS RANKING
+            CLASIFICACIÓN GENERAL
           </h3>
           <span className="text-xs text-slate-400 font-medium">
-            {leaderboard.length} Players Competed
+            {leaderboard.length} Jugadores Compitieron
           </span>
         </div>
 
@@ -156,11 +155,11 @@ export const Podium: React.FC<PodiumProps> = ({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-800/80 bg-slate-950/40 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <th className="py-3 px-4 sm:px-6">Rank</th>
-                <th className="py-3 px-4 sm:px-6">Player</th>
-                <th className="py-3 px-4 sm:px-6 text-right">Points</th>
-                <th className="py-3 px-4 sm:px-6 text-center">Correct</th>
-                <th className="py-3 px-4 sm:px-6 text-right">Avg Response</th>
+                <th className="py-3 px-4 sm:px-6">Pos.</th>
+                <th className="py-3 px-4 sm:px-6">Jugador</th>
+                <th className="py-3 px-4 sm:px-6 text-right">Puntos</th>
+                <th className="py-3 px-4 sm:px-6 text-center">Correctas</th>
+                <th className="py-3 px-4 sm:px-6 text-right">Tiempo Prom.</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-sm">
@@ -196,7 +195,7 @@ export const Podium: React.FC<PodiumProps> = ({
                       <span>{entry.nickname}</span>
                       {isCurrent && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-black">
-                          YOU
+                          TÚ
                         </span>
                       )}
                     </td>
@@ -223,14 +222,13 @@ export const Podium: React.FC<PodiumProps> = ({
         </div>
       </div>
 
-      {/* Play Again button */}
       {onPlayAgain && (
         <button
           onClick={onPlayAgain}
           className="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-base sm:text-lg tracking-wide uppercase shadow-lg shadow-emerald-500/25 transition-all duration-200 active:scale-95 flex items-center gap-2"
         >
           <RotateCcw className="w-5 h-5" />
-          <span>PLAY AGAIN</span>
+          <span>JUGAR DE NUEVO</span>
         </button>
       )}
     </div>

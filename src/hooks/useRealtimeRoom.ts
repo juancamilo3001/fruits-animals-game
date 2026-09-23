@@ -17,10 +17,10 @@ export function useRealtimeRoom(roomCode?: string) {
   const currentQuestionNumRef = useRef<number>(1);
   const roomIdRef = useRef<string | null>(null);
 
-  // 1. Fetch Room, Players, Question, and Answers
+  // 1. Cargar datos iniciales de la sala
   const loadRoomData = useCallback(async (code: string) => {
     if (!isSupabaseConfigured()) {
-      setError('Supabase is not configured. Please add your credentials to .env');
+      setError('Supabase no está configurado. Agrega tus credenciales al archivo .env');
       setLoading(false);
       return;
     }
@@ -28,7 +28,7 @@ export function useRealtimeRoom(roomCode?: string) {
     try {
       const cleanCode = code.toUpperCase().trim();
 
-      // Fetch room
+      // Obtener datos de la sala
       const { data: roomData, error: roomErr } = await supabase
         .from('rooms')
         .select('*')
@@ -36,7 +36,7 @@ export function useRealtimeRoom(roomCode?: string) {
         .single();
 
       if (roomErr || !roomData) {
-        setError(`Room "${cleanCode}" was not found.`);
+        setError(`La sala "${cleanCode}" no fue encontrada.`);
         setLoading(false);
         return;
       }
@@ -45,7 +45,7 @@ export function useRealtimeRoom(roomCode?: string) {
       roomIdRef.current = roomData.id;
       currentQuestionNumRef.current = roomData.current_question;
 
-      // Fetch players
+      // Obtener jugadores
       const { data: playersData, error: playersErr } = await supabase
         .from('players')
         .select('*')
@@ -57,7 +57,7 @@ export function useRealtimeRoom(roomCode?: string) {
         prevPlayersCountRef.current = playersData.length;
       }
 
-      // Fetch current question from public view
+      // Obtener pregunta actual (vista pública, sin respuesta correcta)
       if (roomData.status !== 'WAITING') {
         const { data: qData, error: qErr } = await supabase
           .from('questions_public')
@@ -69,7 +69,7 @@ export function useRealtimeRoom(roomCode?: string) {
           setCurrentQuestion(qData as QuestionPublic);
         }
 
-        // If results state, fetch result
+        // Si está en resultados, obtener resultado
         if (roomData.status === 'QUESTION_RESULTS' || roomData.status === 'FINISHED') {
           const { data: resData } = await supabase.rpc('get_question_result', {
             p_room_code: cleanCode,
@@ -82,13 +82,13 @@ export function useRealtimeRoom(roomCode?: string) {
           setCurrentResult(null);
         }
 
-        // Fetch answers for current question
+        // Obtener respuestas de la pregunta actual, ordenadas por response_time_ms
         const { data: ansData } = await supabase
           .from('game_answers')
           .select('*')
           .eq('room_id', roomData.id)
           .eq('question_number', roomData.current_question)
-          .order('answered_at', { ascending: true });
+          .order('response_time_ms', { ascending: true });
 
         if (ansData) {
           setAnswers(ansData as GameAnswer[]);
@@ -101,14 +101,14 @@ export function useRealtimeRoom(roomCode?: string) {
 
       setError(null);
     } catch (err: unknown) {
-      console.error('Error loading room data:', err);
-      setError(err instanceof Error ? err.message : 'Error loading room data');
+      console.error('Error al cargar datos de la sala:', err);
+      setError(err instanceof Error ? err.message : 'Error al cargar datos de la sala');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 2. Setup Realtime Channel
+  // 2. Canal Realtime
   useEffect(() => {
     if (!roomCode || !isSupabaseConfigured()) {
       setLoading(false);
@@ -118,12 +118,11 @@ export function useRealtimeRoom(roomCode?: string) {
     const cleanCode = roomCode.toUpperCase().trim();
     loadRoomData(cleanCode);
 
-    // Create channel
     const channelName = `game_room_${cleanCode}`;
     const channel = supabase.channel(channelName);
 
     channel
-      // A. Listen to ROOM updates (status, current_question, etc.)
+      // A. Cambios en la sala (estado, pregunta actual, etc.)
       .on(
         'postgres_changes',
         {
@@ -136,15 +135,16 @@ export function useRealtimeRoom(roomCode?: string) {
           if (updated && updated.room_code === cleanCode) {
             setRoom(updated);
 
-            // If question changed or status transitioned to active
+            // Si cambió la pregunta o el estado pasó a activo → limpiar respuestas y cargar nueva pregunta
             if (
               updated.current_question !== currentQuestionNumRef.current ||
               updated.status === 'QUESTION_ACTIVE'
             ) {
               currentQuestionNumRef.current = updated.current_question;
               setCurrentResult(null);
+              setAnswers([]); // Limpiar respuestas de la pregunta anterior
 
-              // Load new question
+              // Cargar nueva pregunta
               const { data: qData } = await supabase
                 .from('questions_public')
                 .select('*')
@@ -155,20 +155,20 @@ export function useRealtimeRoom(roomCode?: string) {
                 setCurrentQuestion(qData as QuestionPublic);
               }
 
-              // Load answers for the new question
+              // Cargar respuestas de la nueva pregunta (normalmente vacío al inicio)
               const { data: ansData } = await supabase
                 .from('game_answers')
                 .select('*')
                 .eq('room_id', updated.id)
                 .eq('question_number', updated.current_question)
-                .order('answered_at', { ascending: true });
+                .order('response_time_ms', { ascending: true });
 
               if (ansData) {
                 setAnswers(ansData as GameAnswer[]);
               }
             }
 
-            // If transitioned to QUESTION_RESULTS or FINISHED
+            // Si pasó a QUESTION_RESULTS o FINISHED → obtener resultado
             if (updated.status === 'QUESTION_RESULTS' || updated.status === 'FINISHED') {
               const { data: resData } = await supabase.rpc('get_question_result', {
                 p_room_code: cleanCode,
@@ -181,7 +181,7 @@ export function useRealtimeRoom(roomCode?: string) {
           }
         }
       )
-      // B. Listen to PLAYERS updates (joins, score updates)
+      // B. Cambios en jugadores (unirse, actualización de puntaje)
       .on(
         'postgres_changes',
         {
@@ -209,7 +209,7 @@ export function useRealtimeRoom(roomCode?: string) {
           }
         }
       )
-      // C. Listen to GAME_ANSWERS (real-time Answer Order!)
+      // C. Nuevas respuestas en game_answers (Realtime)
       .on(
         'postgres_changes',
         {
@@ -227,11 +227,10 @@ export function useRealtimeRoom(roomCode?: string) {
             newAnswer.question_number === currentQuestionNumRef.current
           ) {
             setAnswers((prev) => {
+              // No duplicar
               if (prev.some((a) => a.id === newAnswer.id)) return prev;
-              return [...prev, newAnswer].sort(
-                (a, b) =>
-                  new Date(a.answered_at).getTime() - new Date(b.answered_at).getTime()
-              );
+              // Insertar y ordenar por response_time_ms (fuente de verdad del servidor)
+              return [...prev, newAnswer].sort((a, b) => a.response_time_ms - b.response_time_ms);
             });
             sounds.playTick();
           }
@@ -246,12 +245,12 @@ export function useRealtimeRoom(roomCode?: string) {
     };
   }, [roomCode, loadRoomData]);
 
-  // Combine answers with player nicknames
+  // Enriquecer respuestas con nickname del jugador
   const enrichedAnswers = answers.map((ans) => {
     const player = players.find((p) => p.id === ans.player_id);
     return {
       ...ans,
-      nickname: player ? player.nickname : 'Unknown Player',
+      nickname: player ? player.nickname : 'Jugador desconocido',
     };
   });
 

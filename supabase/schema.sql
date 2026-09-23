@@ -357,6 +357,11 @@ BEGIN
     -- Calculate official response time in ms based on server clock
     v_ms := GREATEST(10, ROUND(EXTRACT(EPOCH FROM (v_now - v_room.question_started_at)) * 1000)::INT);
 
+    -- 15-second time limit
+    IF v_ms > 15000 THEN
+        RAISE EXCEPTION 'Time limit expired for this question.';
+    END IF;
+
     -- Check correctness
     v_is_correct := (v_selected = v_question.correct_answer);
 

@@ -11,31 +11,31 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className = ''
     switch (status) {
       case 'WAITING':
         return {
-          label: 'LOBBY WAITING',
+          label: 'SALA DE ESPERA',
           bg: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
           dot: 'bg-amber-400 animate-pulse',
         };
       case 'QUESTION_ACTIVE':
         return {
-          label: 'LIVE QUESTION',
+          label: 'PREGUNTA EN VIVO',
           bg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
           dot: 'bg-emerald-400 animate-ping',
         };
       case 'QUESTION_RESULTS':
         return {
-          label: 'QUESTION RESULTS',
+          label: 'RESULTADOS',
           bg: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
           dot: 'bg-cyan-400',
         };
       case 'PAUSED':
         return {
-          label: 'PAUSED',
+          label: 'PAUSADO',
           bg: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
           dot: 'bg-rose-400',
         };
       case 'FINISHED':
         return {
-          label: 'GAME COMPLETED',
+          label: 'FINALIZADO',
           bg: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
           dot: 'bg-purple-400',
         };
