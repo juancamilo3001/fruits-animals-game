@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Shield,
@@ -29,6 +29,9 @@ import { supabase } from '../lib/supabase';
 import { LeaderboardEntry } from '../types/game';
 
 export const HostDashboardPage: React.FC = () => {
+  const QUESTION_TIME_LIMIT_MS = 15_000;
+  const RESULTS_DISPLAY_MS = 4_000;
+
   const { roomCode } = useParams<{ roomCode: string }>();
   const navigate = useNavigate();
   const cleanCode = (roomCode || '').toUpperCase().trim();
@@ -53,6 +56,7 @@ export const HostDashboardPage: React.FC = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const autoAdvanceRef = useRef<string | null>(null);
 
   // Fetch Leaderboard when finished
   useEffect(() => {
@@ -96,32 +100,100 @@ export const HostDashboardPage: React.FC = () => {
   };
 
   // Advance Game State
-  const handleAdvance = async (action: 'SHOW_RESULTS' | 'NEXT_QUESTION' | 'PAUSE' | 'RESUME' | 'END_GAME') => {
-    if (!hostToken) return;
-    setActionLoading(true);
-    setActionError(null);
-    try {
-      const { error: rpcErr } = await supabase.rpc('advance_game_state', {
-        p_room_code: cleanCode,
-        p_host_token: hostToken,
-        p_action: action,
-      });
-      if (rpcErr) throw new Error(rpcErr.message);
-    } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : 'Action failed');
-    } finally {
-      setActionLoading(false);
+  const handleAdvance = useCallback(
+    async (action: 'SHOW_RESULTS' | 'NEXT_QUESTION' | 'PAUSE' | 'RESUME' | 'END_GAME') => {
+      if (!hostToken) return;
+
+      setActionLoading(true);
+      setActionError(null);
+
+      try {
+        const { error: rpcErr } = await supabase.rpc('advance_game_state', {
+          p_room_code: cleanCode,
+          p_host_token: hostToken,
+          p_action: action,
+        });
+
+        if (rpcErr) throw new Error(rpcErr.message);
+      } catch (err: unknown) {
+        setActionError(err instanceof Error ? err.message : 'Action failed');
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [cleanCode, hostToken]
+  );
+
+  // Automatic 15-second question timer
+  useEffect(() => {
+    if (!room || !hostToken || room.status !== 'QUESTION_ACTIVE') return;
+    if (!room.question_started_at) return;
+
+    const startedAt = new Date(room.question_started_at).getTime();
+    const elapsed = Date.now() - startedAt;
+    const remaining = Math.max(0, QUESTION_TIME_LIMIT_MS - elapsed);
+
+    const key = `${cleanCode}-${room.current_question}-results`;
+
+    if (remaining === 0) {
+      if (autoAdvanceRef.current !== key) {
+        autoAdvanceRef.current = key;
+        handleAdvance('SHOW_RESULTS');
+      }
+      return;
     }
-  };
+
+    const timer = window.setTimeout(() => {
+      if (autoAdvanceRef.current !== key) {
+        autoAdvanceRef.current = key;
+        handleAdvance('SHOW_RESULTS');
+      }
+    }, remaining);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    room?.status,
+    room?.current_question,
+    room?.question_started_at,
+    cleanCode,
+    hostToken,
+    handleAdvance,
+  ]);
+
+  // Automatic transition from results to next question
+  useEffect(() => {
+    if (!room || !hostToken || room.status !== 'QUESTION_RESULTS') return;
+
+    const key = `${cleanCode}-${room.current_question}-next`;
+
+    if (autoAdvanceRef.current === key) return;
+
+    const timer = window.setTimeout(() => {
+      if (autoAdvanceRef.current !== key) {
+        autoAdvanceRef.current = key;
+        handleAdvance('NEXT_QUESTION');
+      }
+    }, RESULTS_DISPLAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    room?.status,
+    room?.current_question,
+    cleanCode,
+    hostToken,
+    handleAdvance,
+  ]);
 
   // Submit manual token
   const handleManualTokenSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!manualTokenInput.trim()) return;
+
     saveHostSession({
       roomCode: cleanCode,
       hostToken: manualTokenInput.trim(),
     });
+
     setHostToken(manualTokenInput.trim());
     setTokenAuthError(null);
   };
